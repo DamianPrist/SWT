@@ -7,6 +7,7 @@ public class main {
         SwingUtilities.invokeLater(()->{
             Login login = new Login();
             login.setVisible(true);
+            System.out.println("Test Upload");
         });
     }
 }
