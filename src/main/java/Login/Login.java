@@ -38,7 +38,7 @@ public class Login extends JFrame {
         Connection connection = null;
         try {
             connection= DatabaseConnection.getConnection();
-            String query = "SELECT * FROM jformtest WHERE username = ? AND password = ?";
+            String query = "SELECT * FROM user WHERE username = ? AND password = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, username);//设置第一个占位符为用户名

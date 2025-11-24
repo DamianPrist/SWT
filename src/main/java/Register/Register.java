@@ -53,7 +53,7 @@ public class Register extends JFrame {
         try {
             //判断用户名是否存在
            connection= DatabaseConnection.getConnection();
-            String query = "SELECT * FROM jformtest WHERE username = ?";
+            String query = "SELECT * FROM user WHERE username = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, username);
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -64,7 +64,7 @@ public class Register extends JFrame {
             }
 
             // 插入新用户
-            String insertQuery = "INSERT INTO jformtest (username, password) VALUES (?, ?)";
+            String insertQuery = "INSERT INTO user (username, password) VALUES (?, ?)";
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
                 insertStatement.setString(1, username);
                 insertStatement.setString(2, password);
