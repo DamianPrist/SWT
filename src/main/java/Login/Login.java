@@ -13,13 +13,14 @@ import javax.swing.*;
 
 
 /**
- * @author lenovo
+ * @author SUNRISE
  */
 public class Login extends JFrame {
     public Login() {
         initComponents();
     }
 
+    // 登录按钮点击事件
     private void login_button(ActionEvent e) {
         if(e.getSource()==loginbutton){
             String username = textField1.getText();
