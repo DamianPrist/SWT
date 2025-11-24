@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    // 新增阿里云镜像配置
+    <!--新增阿里云镜像配置-->
     <repositories>
         <repository>
             <id>aliyun-public</id>
