@@ -1,7 +1,7 @@
 package Login;
 
+import Connect.DatabaseConnection;
 import Register.Register;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
@@ -13,13 +13,14 @@ import javax.swing.*;
 
 
 /**
- * @author lenovo
+ * @author SUNRISE
  */
 public class Login extends JFrame {
     public Login() {
         initComponents();
     }
 
+    // 登录按钮点击事件
     private void login_button(ActionEvent e) {
         if(e.getSource()==loginbutton){
             String username = textField1.getText();
@@ -34,8 +35,9 @@ public class Login extends JFrame {
 
     // 验证用户名和密码
     private boolean validateUser(String username, String password) {
+        Connection connection = null;
         try {
-            Connection connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/test_lib","root","dy85111168");
+            connection= DatabaseConnection.getConnection();
             String query = "SELECT * FROM jformtest WHERE username = ? AND password = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -49,6 +51,8 @@ public class Login extends JFrame {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "数据库连接或查询出现问题：" + e.getMessage());
             return false;
+        }finally {
+            DatabaseConnection.closeConnection(connection);
         }
     }
 
@@ -57,6 +61,7 @@ public class Login extends JFrame {
         register.setVisible(true);
     }
 
+    //前端界面
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         label1 = new JLabel();

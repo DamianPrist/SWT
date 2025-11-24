@@ -4,12 +4,15 @@
 
 package Register;
 
+import Connect.DatabaseConnection;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.*;
 import javax.swing.*;
 
 /**
- * @author lenovo
+ * @author SUNRISE
  */
 public class Register extends JFrame {
     public Register() {
@@ -23,8 +26,61 @@ public class Register extends JFrame {
 
     //注册按钮点击事件
     private void register_button(ActionEvent e) {
+        if(e.getSource()==button1){
+            String username = textField1.getText();
+            String password = new String(passwordField1.getPassword());
+            String password2 = new String(passwordField2.getPassword());
+            if(!password.equals(password2)){
+                JOptionPane.showMessageDialog(null, "两次输入的密码不一致！", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(username.equals("")||password.equals("")||password2.equals("")){
+                JOptionPane.showMessageDialog(null, "请填写完整！", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(password.length()<6){
+                JOptionPane.showMessageDialog(null, "密码长度不能小于6位！", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(registerUser(username, password)){
+                JOptionPane.showMessageDialog(null, "注册成功！", "提示", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 
+    private boolean registerUser(String username, String password) {
+        Connection connection = null;
+        try {
+            //判断用户名是否存在
+           connection= DatabaseConnection.getConnection();
+            String query = "SELECT * FROM jformtest WHERE username = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, username);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    JOptionPane.showMessageDialog(null, "用户名已存在！", "错误", JOptionPane.ERROR_MESSAGE);
+                    return false; // 用户名存在则返回false
+                }
+            }
+
+            // 插入新用户
+            String insertQuery = "INSERT INTO jformtest (username, password) VALUES (?, ?)";
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                insertStatement.setString(1, username);
+                insertStatement.setString(2, password);
+                int rowsAffected = insertStatement.executeUpdate();
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "注册失败！", "错误", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }finally {
+            DatabaseConnection.closeConnection(connection);
+        }
+    }
+
+    //前端界面
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         label1 = new JLabel();
@@ -78,6 +134,7 @@ public class Register extends JFrame {
         button1.setBackground(new Color(70, 130, 180)); // 使用与登录按钮相同的蓝色
         button1.setForeground(Color.WHITE); // 白色文字
         button1.setFocusPainted(false); // 不绘制焦点边框
+        button1.addActionListener(e -> register_button(e));
         contentPane.add(button1);
         button1.setBounds(260, 270, 100, 35); // 调整位置和大小
 
