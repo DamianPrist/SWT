@@ -11,7 +11,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.*;
 
-
 /**
  * SWT 版本注册界面
  * @author SUNRISE / Gemini / echo-escape
@@ -23,10 +22,12 @@ public class Register {
     private Text textPassword;
     private Text textConfirmPassword;
 
-    // 资源对象，用于后续释放
+    // 颜色和字体资源
+    private Color primaryColor;
+    private Color secondaryColor;
+    private Color accentColor;
     private Color bgColor;
-    private Color btnRegisterColor;
-    private Color btnBackColor;
+    private Color textFieldBgColor;
     private Font titleFont;
     private Font normalFont;
     private Font btnFont;
@@ -56,18 +57,20 @@ public class Register {
     protected void createContents() {
         // 初始化 Shell
         shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
-        shell.setSize(550, 400);
-        shell.setText("注册");
+        shell.setSize(650, 550); // 增大窗口尺寸
+        shell.setText("用户注册");
 
         // 初始化颜色和字体资源
-        Display display = Display.getDefault();
-        bgColor = new Color(display, 240, 248, 255); // AliceBlue
-        btnRegisterColor = new Color(display, 70, 130, 180); // SteelBlue
-        btnBackColor = new Color(display, 72, 209, 204); // MediumTurquoise
+        Display display = Display.getCurrent();
+        primaryColor = new Color(display, 74, 144, 226);   // 主色调蓝色
+        secondaryColor = new Color(display, 250, 250, 252); // 次要背景色
+        accentColor = new Color(display, 102, 187, 106);   // 强调色绿色
+        bgColor = new Color(display, 248, 250, 252);       // 主背景色
+        textFieldBgColor = new Color(display, 255, 255, 255); // 输入框背景
 
-        titleFont = new Font(display, "微软雅黑", 24, SWT.BOLD);
-        normalFont = new Font(display, "微软雅黑", 14, SWT.NORMAL);
-        btnFont = new Font(display, "微软雅黑", 14, SWT.BOLD);
+        titleFont = new Font(display, "微软雅黑", 24, SWT.BOLD); // 减小标题字体
+        normalFont = new Font(display, "微软雅黑", 11, SWT.NORMAL);
+        btnFont = new Font(display, "微软雅黑", 12, SWT.BOLD);
 
         shell.setBackground(bgColor);
 
@@ -79,54 +82,91 @@ public class Register {
                 (screenSize.height - shellSize.height) / 2
         );
 
-        //---- 标题 Label ----
-        Label labelTitle = new Label(shell, SWT.CENTER);
-        labelTitle.setText("注册");
-        labelTitle.setFont(titleFont);
-        labelTitle.setBackground(bgColor);
-        labelTitle.setBounds(200, 40, 150, 50);
+        // 头部区域
+        Composite headerComposite = new Composite(shell, SWT.NONE);
+        headerComposite.setBackground(primaryColor);
+        headerComposite.setBounds(0, 0, 650, 100);
 
-        //---- 用户名 Label ----
-        Label labelUser = new Label(shell, SWT.CENTER);
+        //---- 标题 Label - 调整高度确保字体完整显示
+        Label labelTitle = new Label(headerComposite, SWT.CENTER);
+        labelTitle.setText("创建账号");
+        labelTitle.setFont(titleFont);
+        labelTitle.setForeground(new Color(display, 255, 255, 255));
+        labelTitle.setBackground(primaryColor);
+        labelTitle.setBounds(0, 15, 650, 70); // 调整位置和高度
+
+        // 主内容区域
+        Composite mainComposite = new Composite(shell, SWT.NONE);
+        mainComposite.setBackground(bgColor);
+        mainComposite.setBounds(75, 130, 500, 350);
+
+        //---- 用户名 Label - 增加高度
+        Label labelUser = new Label(mainComposite, SWT.NONE);
         labelUser.setText("用户名");
         labelUser.setFont(normalFont);
         labelUser.setBackground(bgColor);
-        labelUser.setBounds(130, 110, 80, 30);
+        labelUser.setBounds(50, 40, 100, 30); // 增加高度到30
 
-        //---- 用户名输入框 ----
-        textUsername = new Text(shell, SWT.BORDER | SWT.CENTER);
+        //---- 用户名输入框 - 增加高度
+        textUsername = new Text(mainComposite, SWT.BORDER | SWT.SINGLE);
         textUsername.setFont(normalFont);
-        textUsername.setBounds(220, 110, 200, 35);
+        textUsername.setBackground(textFieldBgColor);
+        textUsername.setBounds(150, 35, 300, 40); // 增加高度到40
 
-        //---- 密码 Label ----
-        Label labelPwd = new Label(shell, SWT.CENTER);
-        labelPwd.setText("密码");
+        //---- 密码 Label - 增加高度
+        Label labelPwd = new Label(mainComposite, SWT.NONE);
+        labelPwd.setText("设置密码");
         labelPwd.setFont(normalFont);
         labelPwd.setBackground(bgColor);
-        labelPwd.setBounds(130, 160, 80, 30);
+        labelPwd.setBounds(50, 100, 100, 30); // 增加高度到30
 
-        // 密码输入框
-        textPassword = new Text(shell, SWT.BORDER | SWT.PASSWORD | SWT.CENTER);
+        // 密码输入框 - 增加高度
+        textPassword = new Text(mainComposite, SWT.BORDER | SWT.PASSWORD | SWT.SINGLE);
         textPassword.setFont(normalFont);
-        textPassword.setBounds(220, 160, 200, 35);
+        textPassword.setBackground(textFieldBgColor);
+        textPassword.setBounds(150, 95, 300, 40); // 增加高度到40
 
-        // 确认密码 Label
-        Label labelConfirm = new Label(shell, SWT.CENTER);
+        // 确认密码 Label - 增加高度
+        Label labelConfirm = new Label(mainComposite, SWT.NONE);
         labelConfirm.setText("确认密码");
         labelConfirm.setFont(normalFont);
         labelConfirm.setBackground(bgColor);
-        labelConfirm.setBounds(100, 210, 120, 30);
+        labelConfirm.setBounds(50, 160, 100, 30); // 增加高度到30
 
-        // 确认密码输入框
-        textConfirmPassword = new Text(shell, SWT.BORDER | SWT.PASSWORD | SWT.CENTER);
+        // 确认密码输入框 - 增加高度
+        textConfirmPassword = new Text(mainComposite, SWT.BORDER | SWT.PASSWORD | SWT.SINGLE);
         textConfirmPassword.setFont(normalFont);
-        textConfirmPassword.setBounds(220, 210, 200, 30);
+        textConfirmPassword.setBackground(textFieldBgColor);
+        textConfirmPassword.setBounds(150, 155, 300, 40); // 增加高度到40
 
-        // 返回按钮
-        Button btnBack = new Button(shell, SWT.PUSH);
-        btnBack.setText("返回");
+        // 密码要求提示 - 增加高度
+        Label passwordHint = new Label(mainComposite, SWT.NONE);
+        passwordHint.setText("• 密码长度至少6位");
+        passwordHint.setForeground(new Color(display, 153, 153, 153));
+        passwordHint.setFont(new Font(display, "微软雅黑", 10, SWT.NORMAL)); // 调整字体大小
+        passwordHint.setBackground(bgColor);
+        passwordHint.setBounds(150, 200, 200, 25); // 增加高度到25
+
+        // 按钮容器
+        Composite buttonComposite = new Composite(mainComposite, SWT.NONE);
+        buttonComposite.setBackground(bgColor);
+        buttonComposite.setBounds(50, 240, 400, 50);
+
+        // 返回按钮 - 增加高度
+        Button btnBack = new Button(buttonComposite, SWT.PUSH);
+        btnBack.setText("返回登录");
         btnBack.setFont(btnFont);
-        btnBack.setBounds(140, 270, 100, 35);
+        btnBack.setBackground(secondaryColor);
+        btnBack.setForeground(primaryColor);
+        btnBack.setBounds(0, 0, 180, 45); // 增加高度到45
+
+        // 添加鼠标悬停效果
+        btnBack.addListener(SWT.MouseEnter, e -> {
+            btnBack.setBackground(new Color(display, 240, 242, 245));
+        });
+        btnBack.addListener(SWT.MouseExit, e -> {
+            btnBack.setBackground(secondaryColor);
+        });
 
         // 添加返回事件
         btnBack.addSelectionListener(new SelectionAdapter() {
@@ -136,11 +176,21 @@ public class Register {
             }
         });
 
-        // 注册按钮
-        Button btnRegister = new Button(shell, SWT.PUSH);
-        btnRegister.setText("注册");
+        // 注册按钮 - 增加高度
+        Button btnRegister = new Button(buttonComposite, SWT.PUSH);
+        btnRegister.setText("立即注册");
         btnRegister.setFont(btnFont);
-        btnRegister.setBounds(260, 270, 100, 35);
+        btnRegister.setBackground(accentColor);
+        btnRegister.setForeground(new Color(display, 255, 255, 255));
+        btnRegister.setBounds(220, 0, 180, 45); // 增加高度到45
+
+        // 添加鼠标悬停效果
+        btnRegister.addListener(SWT.MouseEnter, e -> {
+            btnRegister.setBackground(new Color(display, 85, 170, 85));
+        });
+        btnRegister.addListener(SWT.MouseExit, e -> {
+            btnRegister.setBackground(accentColor);
+        });
 
         // 添加注册事件
         btnRegister.addSelectionListener(new SelectionAdapter() {
@@ -150,15 +200,25 @@ public class Register {
             }
         });
 
+        // 底部信息 - 增加高度
+        Label footerLabel = new Label(shell, SWT.CENTER);
+        footerLabel.setText("已有账号？请返回登录界面");
+        footerLabel.setForeground(new Color(display, 153, 153, 153));
+        footerLabel.setFont(new Font(display, "微软雅黑", 10, SWT.NORMAL)); // 调整字体大小
+        footerLabel.setBackground(bgColor);
+        footerLabel.setBounds(0, 500, 650, 30); // 增加高度到30
+
         // 监听窗口关闭，释放资源
         shell.addDisposeListener(e -> disposeResources());
     }
 
     // 释放颜色和字体资源
     private void disposeResources() {
+        if (primaryColor != null) primaryColor.dispose();
+        if (secondaryColor != null) secondaryColor.dispose();
+        if (accentColor != null) accentColor.dispose();
         if (bgColor != null) bgColor.dispose();
-        if (btnRegisterColor != null) btnRegisterColor.dispose();
-        if (btnBackColor != null) btnBackColor.dispose();
+        if (textFieldBgColor != null) textFieldBgColor.dispose();
         if (titleFont != null) titleFont.dispose();
         if (normalFont != null) normalFont.dispose();
         if (btnFont != null) btnFont.dispose();
@@ -214,5 +274,4 @@ public class Register {
         mb.setMessage(message);
         mb.open();
     }
-
 }

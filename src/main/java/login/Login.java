@@ -13,8 +13,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.*;
 import register.Register;
 
-
-
 /**
  * SWT login 界面
  * @author SUNRISE / Gemini / echo-escape
@@ -24,11 +22,18 @@ public class Login {
     protected Shell shell;
     private Text textUser;
     private Text textPassword;
-    private Font fontInput;// 统一输入字体格式
+    private Font fontInput;
 
     // 用户数据访问对象
     private UserDAO userDAO = new UserDAO();
     private User currentUser;
+
+    // 美化用的颜色资源
+    private Color primaryColor;
+    private Color secondaryColor;
+    private Color accentColor;
+    private Color bgColor;
+    private Color textFieldBgColor;
 
     /**
      * 打开窗口
@@ -61,57 +66,96 @@ public class Login {
      */
     protected void createContents() {
         shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
-        shell.setSize(550, 400);
+        shell.setSize(600, 500); // 稍微增大窗口尺寸
         shell.setText("用户登录");
-        // 设置背景色 (浅蓝)
-        Color bgColor = new Color(Display.getCurrent(), 240, 248, 255);
+
+        // 初始化颜色方案 - 现代浅色主题
+        Display display = Display.getCurrent();
+        primaryColor = new Color(display, 74, 144, 226);   // 主色调蓝色
+        secondaryColor = new Color(display, 250, 250, 252); // 次要背景色
+        accentColor = new Color(display, 102, 187, 106);   // 强调色绿色
+        bgColor = new Color(display, 248, 250, 252);       // 主背景色
+        textFieldBgColor = new Color(display, 255, 255, 255); // 输入框背景
+
         shell.setBackground(bgColor);
 
-        // 这是一个监听器，用于在窗口关闭时销毁我们创建的颜色资源，防止内存泄漏
-        shell.addDisposeListener(e -> bgColor.dispose());
+        // 监听器用于释放资源
+        shell.addDisposeListener(e -> {
+            primaryColor.dispose();
+            secondaryColor.dispose();
+            accentColor.dispose();
+            bgColor.dispose();
+            textFieldBgColor.dispose();
+        });
 
-        // 标题 Label
-        Label labelTitle = new Label(shell, SWT.CENTER);
-        labelTitle.setText("请登录");
-        labelTitle.setBackground(bgColor); // 背景色需与父容器一致
-        Font fontTitle = new Font(Display.getCurrent(), "微软雅黑", 24, SWT.BOLD);
+        // 创建渐变背景的Composite（模拟现代卡片效果）
+        Composite headerComposite = new Composite(shell, SWT.NONE);
+        headerComposite.setBackgroundMode(SWT.INHERIT_DEFAULT);
+        headerComposite.setBackground(primaryColor);
+        headerComposite.setBounds(0, 0, 600, 120);
+
+        // 标题 Label - 增加高度确保字体完整显示
+        Label labelTitle = new Label(headerComposite, SWT.CENTER);
+        labelTitle.setText("欢迎登录");
+        labelTitle.setForeground(new Color(display, 255, 255, 255)); // 白色文字
+        Font fontTitle = new Font(display, "微软雅黑", 24, SWT.BOLD); // 减小字体大小
         labelTitle.setFont(fontTitle);
-        labelTitle.setBounds(175, 45, 200, 60); // 调整了一下X坐标以适应SWT的渲染
-        // 销毁字体资源
+        labelTitle.setBounds(0, 25, 600, 70); // 调整位置和高度
+        labelTitle.setBackground(primaryColor);
         labelTitle.addDisposeListener(e -> fontTitle.dispose());
 
-        // 账户 Label
-        Label labelUser = new Label(shell, SWT.CENTER);
-        labelUser.setText("账户");
-        labelUser.setBackground(bgColor);
-        Font fontNormal = new Font(Display.getCurrent(), "微软雅黑", 14, SWT.NORMAL);
-        labelUser.setFont(fontNormal);
-        labelUser.setBounds(130, 140, 60, 30);
-        // 这里的fontNormal我们也需要在最后释放，或者让控件销毁时释放
+        // 主内容区域
+        Composite mainComposite = new Composite(shell, SWT.NONE);
+        mainComposite.setBackground(bgColor);
+        mainComposite.setBounds(50, 150, 500, 280);
 
-        // 密码 Label
-        Label labelPwd = new Label(shell, SWT.CENTER);
+        // 账户 Label - 增加高度
+        Label labelUser = new Label(mainComposite, SWT.NONE);
+        labelUser.setText("用户名");
+        labelUser.setBackground(bgColor);
+        Font fontLabel = new Font(display, "微软雅黑", 12, SWT.NORMAL);
+        labelUser.setFont(fontLabel);
+        labelUser.setBounds(50, 40, 80, 30); // 增加高度到30
+
+        // 用户名输入框 - 增加高度
+        textUser = new Text(mainComposite, SWT.BORDER | SWT.SINGLE);
+        textUser.setFont(new Font(display, "微软雅黑", 11, SWT.NORMAL));
+        textUser.setBackground(textFieldBgColor);
+        textUser.setBounds(140, 35, 300, 40); // 增加高度到40
+
+        // 密码 Label - 增加高度
+        Label labelPwd = new Label(mainComposite, SWT.NONE);
         labelPwd.setText("密码");
         labelPwd.setBackground(bgColor);
-        labelPwd.setFont(fontNormal);
-        labelPwd.setBounds(130, 190, 60, 30);
+        labelPwd.setFont(fontLabel);
+        labelPwd.setBounds(50, 100, 80, 30); // 增加高度到30
 
-        // 用户名输入框
-        textUser = new Text(shell, SWT.BORDER | SWT.CENTER);
-        textUser.setFont(fontNormal);
-        textUser.setBounds(220, 140, 200, 30);
+        // 密码输入框 - 增加高度
+        textPassword = new Text(mainComposite, SWT.BORDER | SWT.PASSWORD | SWT.SINGLE);
+        textPassword.setFont(new Font(display, "微软雅黑", 11, SWT.NORMAL));
+        textPassword.setBackground(textFieldBgColor);
+        textPassword.setBounds(140, 95, 300, 40); // 增加高度到40
 
-        // 密码输入框
-        // SWT.PASSWORD 用于隐藏输入内容
-        textPassword = new Text(shell, SWT.BORDER | SWT.PASSWORD | SWT.CENTER);
-        textPassword.setFont(fontNormal);
-        textPassword.setBounds(220, 190, 200, 30);
+        // 按钮容器
+        Composite buttonComposite = new Composite(mainComposite, SWT.NONE);
+        buttonComposite.setBackground(bgColor);
+        buttonComposite.setBounds(100, 170, 300, 50); // 调整位置
 
-        // 登录按钮
-        Button btnLogin = new Button(shell, SWT.PUSH);
+        // 登录按钮 - 增加高度
+        Button btnLogin = new Button(buttonComposite, SWT.PUSH);
         btnLogin.setText("登录");
-        btnLogin.setFont(new Font(Display.getCurrent(), "微软雅黑", 12, SWT.BOLD)); // 稍微减小字体以适应按钮
-        btnLogin.setBounds(150, 250, 100, 35);
+        btnLogin.setFont(new Font(display, "微软雅黑", 12, SWT.BOLD));
+        btnLogin.setBackground(primaryColor);
+        btnLogin.setForeground(new Color(display, 255, 255, 255));
+        btnLogin.setBounds(0, 0, 140, 45); // 增加高度到45
+
+        // 添加鼠标悬停效果
+        btnLogin.addListener(SWT.MouseEnter, e -> {
+            btnLogin.setBackground(new Color(display, 56, 124, 206));
+        });
+        btnLogin.addListener(SWT.MouseExit, e -> {
+            btnLogin.setBackground(primaryColor);
+        });
 
         // 登录逻辑
         btnLogin.addSelectionListener(new SelectionAdapter() {
@@ -121,11 +165,21 @@ public class Login {
             }
         });
 
-        // 注册按钮
-        Button btnRegister = new Button(shell, SWT.PUSH);
-        btnRegister.setText("注册");
-        btnRegister.setFont(new Font(Display.getCurrent(), "微软雅黑", 12, SWT.BOLD));
-        btnRegister.setBounds(270, 250, 100, 35);
+        // 注册按钮 - 增加高度
+        Button btnRegister = new Button(buttonComposite, SWT.PUSH);
+        btnRegister.setText("注册账号");
+        btnRegister.setFont(new Font(display, "微软雅黑", 12, SWT.BOLD));
+        btnRegister.setBackground(secondaryColor);
+        btnRegister.setForeground(primaryColor);
+        btnRegister.setBounds(160, 0, 140, 45); // 增加高度到45
+
+        // 添加鼠标悬停效果
+        btnRegister.addListener(SWT.MouseEnter, e -> {
+            btnRegister.setBackground(new Color(display, 240, 242, 245));
+        });
+        btnRegister.addListener(SWT.MouseExit, e -> {
+            btnRegister.setBackground(secondaryColor);
+        });
 
         // 注册逻辑
         btnRegister.addSelectionListener(new SelectionAdapter() {
@@ -135,9 +189,17 @@ public class Login {
             }
         });
 
-        // 统一释放字体资源的监听器
+        // 底部信息 - 增加高度
+        Label footerLabel = new Label(shell, SWT.CENTER);
+        footerLabel.setText("© 2024 系统登录界面");
+        footerLabel.setForeground(new Color(display, 153, 153, 153));
+        footerLabel.setFont(new Font(display, "微软雅黑", 10, SWT.NORMAL)); // 调整字体大小
+        footerLabel.setBackground(bgColor);
+        footerLabel.setBounds(0, 450, 600, 25); // 增加高度到25
+
+        // 统一释放字体资源
         shell.addDisposeListener(e -> {
-            fontNormal.dispose();
+            fontLabel.dispose();
             if (fontInput != null) fontInput.dispose();
         });
     }
@@ -157,11 +219,14 @@ public class Login {
 
         try {
             currentUser = userDAO.validateUser(username, password);
-            if (currentUser!= null) {
+            if (currentUser != null) {
                 showMessage("成功", "登录成功！", SWT.ICON_INFORMATION);
                 // 关闭登录窗口
                 shell.dispose();
-                new MainInterface().open(); // 启动MainInterface
+                // 启动MainInterface并传递用户信息
+                MainInterface mainInterface = new MainInterface();
+                mainInterface.setCurrentUser(currentUser);
+                mainInterface.open();
             } else {
                 showMessage("失败", "登录失败，请检查用户名和密码！", SWT.ICON_ERROR);
             }
@@ -181,13 +246,12 @@ public class Login {
      * 处理注册事件
      */
     private void handleRegister() {
-        // SWT 中通常打开另一个 Shell
         Register register = new Register();
         register.open();
     }
 
     /**
-     * 辅助方法：显示消息弹窗 (替代 JOptionPane)
+     * 辅助方法：显示消息弹窗
      */
     private void showMessage(String title, String message, int iconStyle) {
         MessageBox messageBox = new MessageBox(shell, iconStyle | SWT.OK);
