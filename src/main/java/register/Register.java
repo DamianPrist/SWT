@@ -90,43 +90,41 @@ public class Register {
         labelUser.setText("用户名");
         labelUser.setFont(normalFont);
         labelUser.setBackground(bgColor);
-        labelUser.setBounds(130, 110, 80, 25);
+        labelUser.setBounds(130, 110, 80, 30);
 
         //---- 用户名输入框 ----
         textUsername = new Text(shell, SWT.BORDER | SWT.CENTER);
         textUsername.setFont(normalFont);
-        textUsername.setBounds(220, 110, 200, 30);
+        textUsername.setBounds(220, 110, 200, 35);
 
         //---- 密码 Label ----
         Label labelPwd = new Label(shell, SWT.CENTER);
         labelPwd.setText("密码");
         labelPwd.setFont(normalFont);
         labelPwd.setBackground(bgColor);
-        labelPwd.setBounds(130, 160, 80, 25);
+        labelPwd.setBounds(130, 160, 80, 30);
 
-        //---- 密码输入框 ----
+        // 密码输入框
         textPassword = new Text(shell, SWT.BORDER | SWT.PASSWORD | SWT.CENTER);
         textPassword.setFont(normalFont);
-        textPassword.setBounds(220, 160, 200, 30);
+        textPassword.setBounds(220, 160, 200, 35);
 
-        //---- 确认密码 Label ----
+        // 确认密码 Label
         Label labelConfirm = new Label(shell, SWT.CENTER);
         labelConfirm.setText("确认密码");
         labelConfirm.setFont(normalFont);
         labelConfirm.setBackground(bgColor);
-        labelConfirm.setBounds(130, 210, 80, 25);
+        labelConfirm.setBounds(100, 210, 120, 30);
 
-        //---- 确认密码输入框 ----
+        // 确认密码输入框
         textConfirmPassword = new Text(shell, SWT.BORDER | SWT.PASSWORD | SWT.CENTER);
         textConfirmPassword.setFont(normalFont);
         textConfirmPassword.setBounds(220, 210, 200, 30);
 
-        //---- 返回按钮 ----
+        // 返回按钮
         Button btnBack = new Button(shell, SWT.PUSH);
         btnBack.setText("返回");
         btnBack.setFont(btnFont);
-        // SWT Button通常不支持直接setBackground改变整个背景(取决于OS)，但在某些系统有效
-        // 如果需要完全自定义样式的按钮，通常需要自定义绘制，这里保持基础设置
         btnBack.setBounds(140, 270, 100, 35);
 
         // 添加返回事件
@@ -137,7 +135,7 @@ public class Register {
             }
         });
 
-        //---- 注册按钮 ----
+        // 注册按钮
         Button btnRegister = new Button(shell, SWT.PUSH);
         btnRegister.setText("注册");
         btnRegister.setFont(btnFont);
