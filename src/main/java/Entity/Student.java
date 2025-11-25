@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class Student  {
     //todo Student实体类
 
-    private Long studentId;
+    private String studentId;
     private String studentName;
     private String gender;
     private BigDecimal usualGrade;
@@ -15,7 +15,7 @@ public class Student  {
     }
 
     // 全参构造器
-    public Student(Long studentId, String studentName, String gender, BigDecimal usualGrade, BigDecimal examGrade) {
+    public Student(String studentId, String studentName, String gender, BigDecimal usualGrade, BigDecimal examGrade) {
         this.studentId = studentId;
         this.studentName = studentName;
         this.gender = gender;
@@ -24,11 +24,11 @@ public class Student  {
     }
 
     // Getters and Setters
-    public Long getStudentId() {
+    public String getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(Long studentId) {
+    public void setStudentId(String studentId) {
         this.studentId = studentId;
     }
 
