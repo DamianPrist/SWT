@@ -1,6 +1,7 @@
 package MainInterface;
 
 import Entity.User;
+import MainInterface.StudentManagePackage.ShowStudentManage;
 import login.Login;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -61,12 +62,13 @@ public class MainInterface {
     }
 
     /**
-     * 创建界面内容 - 使用布局管理器实现自适应
+     * 创建界面内容 - 固定大小窗口
      */
     protected void createContents() {
-        // 创建可调整大小的窗口
-        shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
-        shell.setSize(1000, 700);
+        // 创建固定大小的窗口（移除SWT.RESIZE）
+        shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
+        // 设置更大的固定尺寸
+        shell.setSize(1400, 900); // 进一步增大窗口尺寸
         shell.setText("学生成绩管理系统");
 
         // 初始化颜色方案
@@ -81,7 +83,7 @@ public class MainInterface {
 
         shell.setBackground(bgColor);
 
-        // 设置主窗口布局 - 3行1列，底部行固定高度
+        // 设置主窗口布局 - 固定布局
         GridLayout shellLayout = new GridLayout(1, false);
         shellLayout.marginWidth = 0;
         shellLayout.marginHeight = 0;
@@ -101,27 +103,34 @@ public class MainInterface {
     }
 
     /**
-     * 创建头部区域
+     * 创建头部区域 - 修复标题显示问题
      */
     private void createHeaderArea() {
         Composite headerComposite = new Composite(shell, SWT.NONE);
         headerComposite.setBackground(primaryColor);
         GridData headerData = new GridData(SWT.FILL, SWT.TOP, true, false);
-        headerData.heightHint = 100; // 固定高度
+        headerData.heightHint = 140; // 增加头部高度，确保标题完整显示
         headerComposite.setLayoutData(headerData);
 
-        // 头部使用FillLayout使标题居中
-        FillLayout headerLayout = new FillLayout(SWT.VERTICAL);
-        headerLayout.marginHeight = 25;
+        // 使用GridLayout替代FillLayout，提供更好的控制
+        GridLayout headerLayout = new GridLayout(1, true);
+        headerLayout.marginHeight = 20;
+        headerLayout.marginWidth = 0;
+        headerLayout.verticalSpacing = 0;
         headerComposite.setLayout(headerLayout);
 
-        // 系统标题
+        // 系统标题 - 使用GridData确保居中和对齐
         Label titleLabel = new Label(headerComposite, SWT.CENTER);
         titleLabel.setText("学生成绩管理系统");
         titleLabel.setForeground(new Color(Display.getCurrent(), 255, 255, 255));
-        Font titleFont = new Font(Display.getCurrent(), "微软雅黑", 22, SWT.BOLD);
+        Font titleFont = new Font(Display.getCurrent(), "微软雅黑", 26, SWT.BOLD); // 增大字体
         titleLabel.setFont(titleFont);
         titleLabel.setBackground(primaryColor);
+
+        // 使用GridData确保标题正确居中并占用可用空间
+        GridData titleData = new GridData(SWT.CENTER, SWT.CENTER, true, true);
+        titleLabel.setLayoutData(titleData);
+
         titleLabel.addDisposeListener(e -> titleFont.dispose());
     }
 
@@ -154,14 +163,14 @@ public class MainInterface {
         Composite sidebarComposite = new Composite(parent, SWT.NONE);
         sidebarComposite.setBackground(sidebarColor);
         GridData sidebarData = new GridData(SWT.LEFT, SWT.FILL, false, true);
-        sidebarData.widthHint = 200; // 固定宽度
+        sidebarData.widthHint = 280; // 增加侧边栏宽度
         sidebarComposite.setLayoutData(sidebarData);
 
         // 侧边栏使用网格布局
         GridLayout sidebarLayout = new GridLayout(1, false);
-        sidebarLayout.marginWidth = 10;
-        sidebarLayout.marginHeight = 30;
-        sidebarLayout.verticalSpacing = 15;
+        sidebarLayout.marginWidth = 20;
+        sidebarLayout.marginHeight = 50;
+        sidebarLayout.verticalSpacing = 25;
         sidebarComposite.setLayout(sidebarLayout);
 
         // 创建侧边栏按钮
@@ -220,12 +229,12 @@ public class MainInterface {
     private Button createSidebarButton(Composite parent, String text, Color bgColor) {
         Button button = new Button(parent, SWT.PUSH);
         button.setText(text);
-        button.setFont(new Font(Display.getCurrent(), "微软雅黑", 12, SWT.BOLD));
+        button.setFont(new Font(Display.getCurrent(), "微软雅黑", 14, SWT.BOLD)); // 增大字体
         button.setBackground(bgColor);
         button.setForeground(new Color(Display.getCurrent(), 255, 255, 255));
 
         GridData buttonData = new GridData(SWT.FILL, SWT.TOP, true, false);
-        buttonData.heightHint = 50; // 固定高度
+        buttonData.heightHint = 70; // 增加按钮高度
         button.setLayoutData(buttonData);
 
         // 添加鼠标悬停效果
@@ -250,19 +259,19 @@ public class MainInterface {
 
         // 内容区域使用网格布局
         GridLayout contentLayout = new GridLayout(1, false);
-        contentLayout.marginWidth = 30;
-        contentLayout.marginHeight = 30;
+        contentLayout.marginWidth = 50;
+        contentLayout.marginHeight = 50;
         contentComposite.setLayout(contentLayout);
 
         // 内容区域标题
         contentTitle = new Label(contentComposite, SWT.CENTER);
         contentTitle.setText("欢迎使用学生成绩管理系统");
         contentTitle.setForeground(primaryColor);
-        Font contentTitleFont = new Font(Display.getCurrent(), "微软雅黑", 16, SWT.BOLD);
+        Font contentTitleFont = new Font(Display.getCurrent(), "微软雅黑", 20, SWT.BOLD); // 增大字体
         contentTitle.setFont(contentTitleFont);
         contentTitle.setBackground(contentBgColor);
         GridData titleData = new GridData(SWT.FILL, SWT.TOP, true, false);
-        titleData.heightHint = 45;
+        titleData.heightHint = 65;
         contentTitle.setLayoutData(titleData);
         contentTitle.addDisposeListener(e -> contentTitleFont.dispose());
 
@@ -273,7 +282,7 @@ public class MainInterface {
 
         // 内容区域使用FillLayout
         FillLayout contentAreaLayout = new FillLayout(SWT.VERTICAL);
-        contentAreaLayout.marginHeight = 20;
+        contentAreaLayout.marginHeight = 30;
         contentArea.setLayout(contentAreaLayout);
 
         // 显示欢迎内容
@@ -287,10 +296,10 @@ public class MainInterface {
         Label footerLabel = new Label(shell, SWT.CENTER);
         footerLabel.setText("© 2025 学生成绩管理系统");
         footerLabel.setForeground(new Color(Display.getCurrent(), 153, 153, 153));
-        footerLabel.setFont(new Font(Display.getCurrent(), "微软雅黑", 11, SWT.NORMAL));
+        footerLabel.setFont(new Font(Display.getCurrent(), "微软雅黑", 13, SWT.NORMAL)); // 增大字体
         footerLabel.setBackground(bgColor);
         GridData footerData = new GridData(SWT.FILL, SWT.BOTTOM, true, false);
-        footerData.heightHint = 30; // 固定高度
+        footerData.heightHint = 50; // 增加底部高度
         footerLabel.setLayoutData(footerData);
     }
 
@@ -317,12 +326,15 @@ public class MainInterface {
         // 创建欢迎标签
         Label welcomeLabel = new Label(contentArea, SWT.WRAP | SWT.CENTER);
         welcomeLabel.setText("欢迎使用学生成绩管理系统！\n\n请从左侧菜单选择您要操作的功能：\n\n• 学生管理 - 管理学生基本信息\n• 成绩管理 - 录入和修改学生成绩\n• 学生总成绩 - 查看学生成绩统计");
-        welcomeLabel.setFont(new Font(contentArea.getDisplay(), "微软雅黑", 14, SWT.NORMAL));
+        welcomeLabel.setFont(new Font(contentArea.getDisplay(), "微软雅黑", 18, SWT.NORMAL)); // 增大字体
         welcomeLabel.setBackground(contentBgColor);
 
         contentArea.layout();
     }
 
+    /**
+     * 显示学生管理界面
+     */
     /**
      * 显示学生管理界面
      */
@@ -333,6 +345,9 @@ public class MainInterface {
         for (Control control : contentArea.getChildren()) {
             control.dispose();
         }
+
+        // 创建学生管理界面
+        new ShowStudentManage(contentArea);
 
         contentArea.layout();
     }
@@ -361,7 +376,6 @@ public class MainInterface {
         for (Control control : contentArea.getChildren()) {
             control.dispose();
         }
-
 
         contentArea.layout();
     }
