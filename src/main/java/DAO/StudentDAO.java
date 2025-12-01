@@ -344,74 +344,6 @@ public class StudentDAO {
     }
 
     /**
-     * 更新学生成绩 - 专门用于成绩管理界面更新单个成绩
-     */
-    public boolean updateSingleGrade(String studentId, String gradeType, BigDecimal grade) {
-        Connection connection = null;
-        try {
-            connection = DatabaseConnection.getConnection();
-
-            // 根据成绩类型构建更新语句
-            String gradeColumn = "usual_grade".equals(gradeType) ? "usual_grade" : "exam_grade";
-            String otherGradeColumn = "usual_grade".equals(gradeType) ? "exam_grade" : "usual_grade";
-
-            // 首先检查另一个成绩是否存在
-            String checkQuery = "SELECT " + otherGradeColumn + " FROM student WHERE student_id = ?";
-            BigDecimal otherGrade = null;
-
-            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-                checkStmt.setString(1, studentId);
-                try (ResultSet rs = checkStmt.executeQuery()) {
-                    if (rs.next()) {
-                        otherGrade = rs.getBigDecimal(1);
-                    }
-                }
-            }
-
-            // 构建更新语句
-            String updateQuery;
-            if (grade != null && otherGrade != null) {
-                // 两个成绩都存在，计算总成绩
-                BigDecimal totalGrade;
-                if ("usual_grade".equals(gradeType)) {
-                    totalGrade = grade.multiply(new BigDecimal("0.4"))
-                            .add(otherGrade.multiply(new BigDecimal("0.6")));
-                } else {
-                    totalGrade = otherGrade.multiply(new BigDecimal("0.4"))
-                            .add(grade.multiply(new BigDecimal("0.6")));
-                }
-
-                updateQuery = "UPDATE student SET " + gradeColumn + " = ?, total_grade = ? WHERE student_id = ?";
-
-                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                    preparedStatement.setBigDecimal(1, grade);
-                    preparedStatement.setBigDecimal(2, totalGrade);
-                    preparedStatement.setString(3, studentId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    return rowsAffected > 0;
-                }
-            } else {
-                // 至少一个成绩为NULL，将总成绩设为NULL
-                updateQuery = "UPDATE student SET " + gradeColumn + " = ?, total_grade = NULL WHERE student_id = ?";
-
-                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                    preparedStatement.setBigDecimal(1, grade);
-                    preparedStatement.setString(2, studentId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    return rowsAffected > 0;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("更新单个成绩失败: " + e.getMessage(), e);
-        } finally {
-            DatabaseConnection.closeConnection(connection);
-        }
-    }
-
-    /**
      * 辅助方法：将 ResultSet 的当前行封装成 Student 对象（包含成绩字段）
      */
     private Student mapRowToStudentWithGrade(ResultSet rs) throws SQLException {
@@ -440,4 +372,65 @@ public class StudentDAO {
         return student;
     }
 
+
+    /**
+     * 验证学生登录（通过学号和密码）
+     */
+    public Student validateStudentLogin(String studentId, String password) {
+        Connection connection = null;
+        try {
+            connection = DatabaseConnection.getConnection();
+
+            // 假设student表有password字段
+            String query = "SELECT * FROM student WHERE student_id = ? AND password = ?";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, studentId);
+                preparedStatement.setString(2, password);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return mapRowToStudent(resultSet);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("验证学生登录失败: " + e.getMessage(), e);
+        } finally {
+            DatabaseConnection.closeConnection(connection);
+        }
+        return null;
+    }
+
+    /**
+     * 获取学生信息（包含成绩字段）
+     */
+    public Student getStudentWithGradeById(String studentId) {
+        Connection connection = null;
+        try {
+            connection = DatabaseConnection.getConnection();
+            String query = "SELECT * FROM student WHERE student_id = ?";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, studentId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return mapRowToStudentWithGrade(resultSet);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("查询学生信息失败: " + e.getMessage(), e);
+        } finally {
+            DatabaseConnection.closeConnection(connection);
+        }
+        return null;
+    }
+
+    public Student getStudentGradeById(String studentId) {
+        return getStudentWithGradeById(studentId);
+    }
 }
