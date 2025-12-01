@@ -1,6 +1,7 @@
 package MainInterface;
 
 import Entity.User;
+import MainInterface.ScoreManagePackage.ShowScoreManage;
 import MainInterface.StudentManagePackage.ShowStudentManage;
 import login.Login;
 import org.eclipse.swt.SWT;
@@ -362,6 +363,7 @@ public class MainInterface {
         for (Control control : contentArea.getChildren()) {
             control.dispose();
         }
+        new ShowScoreManage(contentArea);
 
         contentArea.layout();
     }

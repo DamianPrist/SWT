@@ -62,7 +62,7 @@ public class StudentDAO {
     }
 
     /**
-     * 更新学生信息
+     * 更新学生信息,用于学生管理界面
      */
     public boolean updateStudent(Student student) {
         Connection connection = null;
@@ -201,6 +201,7 @@ public class StudentDAO {
         }
         return false;
     }
+
 
     /**
      * 辅助方法：将 ResultSet 的当前行封装成 Student 对象
