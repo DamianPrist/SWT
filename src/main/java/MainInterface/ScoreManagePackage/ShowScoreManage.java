@@ -427,15 +427,37 @@ public class ShowScoreManage {
             item.setText(0, record.getStudentId());
             item.setText(1, record.getStudentName());
 
-            // 判断成绩类型
-            String scoreType = record.getUsualGrade() != null ? "平时成绩" : "考试成绩";
-            BigDecimal scoreValue = record.getUsualGrade() != null ? record.getUsualGrade() : record.getExamGrade();
+            // 判断成绩类型和值
+            String scoreType;
+            BigDecimal scoreValue = null;
+            String scoreDisplay = "-";
+
+            if (record.getUsualGrade() != null) {
+                scoreType = "平时成绩";
+                scoreValue = record.getUsualGrade();
+                scoreDisplay = scoreValue.toString();
+            } else if (record.getExamGrade() != null) {
+                scoreType = "考试成绩";
+                scoreValue = record.getExamGrade();
+                scoreDisplay = scoreValue.toString();
+            } else {
+                // 如果没有成绩，但记录存在，显示默认类型
+                scoreType = "平时成绩";
+                scoreDisplay = "-";
+            }
 
             item.setText(2, scoreType);
-            item.setText(3, scoreValue.toString());
+            item.setText(3, scoreDisplay);
 
             // 保存成绩类型到item数据中
-            item.setData("scoreType", record.getUsualGrade() != null ? "usual" : "exam");
+            if (record.getUsualGrade() != null) {
+                item.setData("scoreType", "usual");
+            } else if (record.getExamGrade() != null) {
+                item.setData("scoreType", "exam");
+            } else {
+                item.setData("scoreType", "usual"); // 默认
+            }
+
             item.setData("studentId", record.getStudentId());
 
             // 创建操作按钮容器
@@ -450,7 +472,10 @@ public class ShowScoreManage {
             Button editButton = new Button(actionComposite, SWT.PUSH);
             editButton.setText("编辑");
             editButton.setData("studentId", record.getStudentId());
-            editButton.setData("scoreType", record.getUsualGrade() != null ? "usual" : "exam");
+
+            String actualScoreType = (record.getUsualGrade() != null) ? "usual" : "exam";
+            editButton.setData("scoreType", actualScoreType);
+
             editButton.setBackground(new Color(parent.getDisplay(), 255, 193, 7));
             editButton.setForeground(new Color(parent.getDisplay(), 255, 255, 255));
             editButton.setFont(new Font(parent.getDisplay(), "微软雅黑", 9, SWT.NORMAL));
@@ -463,7 +488,7 @@ public class ShowScoreManage {
             Button deleteButton = new Button(actionComposite, SWT.PUSH);
             deleteButton.setText("删除");
             deleteButton.setData("studentId", record.getStudentId());
-            deleteButton.setData("scoreType", record.getUsualGrade() != null ? "usual" : "exam");
+            deleteButton.setData("scoreType", actualScoreType);
             deleteButton.setBackground(new Color(parent.getDisplay(), 239, 83, 80));
             deleteButton.setForeground(new Color(parent.getDisplay(), 255, 255, 255));
             deleteButton.setFont(new Font(parent.getDisplay(), "微软雅黑", 9, SWT.NORMAL));
@@ -851,5 +876,6 @@ public class ShowScoreManage {
      */
     public void dispose() {
         cleanupTableEditors();
+
     }
 }

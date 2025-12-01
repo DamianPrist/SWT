@@ -111,36 +111,130 @@ public class ScoreDAO {
     }
 
     /**
+     * 编辑成绩记录
+     */
+    public boolean editScore(String studentId, String scoreType, BigDecimal score) {
+        Connection connection = null;
+        try {
+            connection = DatabaseConnection.getConnection();
+
+            // 根据成绩类型设置不同的列
+            String gradeColumn = "usual".equals(scoreType) ? "usual_grade" : "exam_grade";
+
+            // 先获取另一个成绩
+            String getOtherGradeQuery = "SELECT " +
+                    ("usual".equals(scoreType) ? "exam_grade" : "usual_grade") +
+                    " FROM student WHERE student_id = ?";
+
+            BigDecimal otherGrade = null;
+            try (PreparedStatement getStmt = connection.prepareStatement(getOtherGradeQuery)) {
+                getStmt.setString(1, studentId);
+                try (ResultSet rs = getStmt.executeQuery()) {
+                    if (rs.next()) {
+                        otherGrade = rs.getBigDecimal(1);
+                    }
+                }
+            }
+
+            // 更新当前成绩并计算总成绩
+            String updateQuery;
+            if (otherGrade != null) {
+                // 如果两个成绩都有，计算总成绩
+                BigDecimal totalGrade;
+                if ("usual".equals(scoreType)) {
+                    totalGrade = score.multiply(new BigDecimal("0.4"))
+                            .add(otherGrade.multiply(new BigDecimal("0.6")));
+                } else {
+                    totalGrade = otherGrade.multiply(new BigDecimal("0.4"))
+                            .add(score.multiply(new BigDecimal("0.6")));
+                }
+
+                updateQuery = "UPDATE student SET " + gradeColumn + " = ?, total_grade = ? WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                    preparedStatement.setBigDecimal(1, score);
+                    preparedStatement.setBigDecimal(2, totalGrade);
+                    preparedStatement.setString(3, studentId);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    return rowsAffected > 0;
+                }
+            } else {
+                // 如果只有一个成绩，不计算总成绩
+                updateQuery = "UPDATE student SET " + gradeColumn + " = ? WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                    preparedStatement.setBigDecimal(1, score);
+                    preparedStatement.setString(2, studentId);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    return rowsAffected > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("编辑成绩失败: " + e.getMessage(), e);
+        } finally {
+            DatabaseConnection.closeConnection(connection);
+        }
+    }
+
+    /**
      * 添加成绩记录
-     * @param studentId 学生学号
-     * @param scoreType 成绩类型（usual:平时成绩, exam:考试成绩）
-     * @param score 成绩值
      */
     public boolean addScore(String studentId, String scoreType, BigDecimal score) {
         Connection connection = null;
         try {
             connection = DatabaseConnection.getConnection();
 
-            // 先检查学生是否存在
-            if (!isStudentExists(studentId)) {
-                return false;
+            // 根据成绩类型设置不同的列
+            String gradeColumn = "usual".equals(scoreType) ? "usual_grade" : "exam_grade";
+
+            // 先获取另一个成绩
+            String getOtherGradeQuery = "SELECT " +
+                    ("usual".equals(scoreType) ? "exam_grade" : "usual_grade") +
+                    " FROM student WHERE student_id = ?";
+
+            BigDecimal otherGrade = null;
+            try (PreparedStatement getStmt = connection.prepareStatement(getOtherGradeQuery)) {
+                getStmt.setString(1, studentId);
+                try (ResultSet rs = getStmt.executeQuery()) {
+                    if (rs.next()) {
+                        otherGrade = rs.getBigDecimal(1);
+                    }
+                }
             }
 
-            String query;
-            if ("usual".equals(scoreType)) {
-                // 修改字段名为下划线格式
-                query = "UPDATE student SET usual_grade = ? WHERE student_id = ?";
+            // 更新成绩并计算总成绩
+            String updateQuery;
+            if (otherGrade != null) {
+                // 如果两个成绩都有，计算总成绩
+                BigDecimal totalGrade;
+                if ("usual".equals(scoreType)) {
+                    totalGrade = score.multiply(new BigDecimal("0.4"))
+                            .add(otherGrade.multiply(new BigDecimal("0.6")));
+                } else {
+                    totalGrade = otherGrade.multiply(new BigDecimal("0.4"))
+                            .add(score.multiply(new BigDecimal("0.6")));
+                }
+
+                updateQuery = "UPDATE student SET " + gradeColumn + " = ?, total_grade = ? WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                    preparedStatement.setBigDecimal(1, score);
+                    preparedStatement.setBigDecimal(2, totalGrade);
+                    preparedStatement.setString(3, studentId);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    return rowsAffected > 0;
+                }
             } else {
-                // 修改字段名为下划线格式
-                query = "UPDATE student SET exam_grade = ? WHERE student_id = ?";
-            }
+                // 如果只有一个成绩，不计算总成绩
+                updateQuery = "UPDATE student SET " + gradeColumn + " = ? WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                    preparedStatement.setBigDecimal(1, score);
+                    preparedStatement.setString(2, studentId);
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setBigDecimal(1, score);
-                preparedStatement.setString(2, studentId);
-
-                int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0;
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    return rowsAffected > 0;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,35 +245,43 @@ public class ScoreDAO {
     }
 
     /**
-     * 编辑成绩记录
-     * @param studentId 学生学号
-     * @param scoreType 成绩类型
-     * @param score 新成绩值
-     */
-    public boolean editScore(String studentId, String scoreType, BigDecimal score) {
-        return addScore(studentId, scoreType, score); // 逻辑相同，复用方法
-    }
-
-    /**
      * 删除成绩记录
-     * @param studentId 学生学号
-     * @param scoreType 成绩类型
      */
     public boolean deleteScore(String studentId, String scoreType) {
         Connection connection = null;
         try {
             connection = DatabaseConnection.getConnection();
 
-            String query;
-            if ("usual".equals(scoreType)) {
-                // 修改字段名为下划线格式
-                query = "UPDATE student SET usual_grade = NULL WHERE student_id = ?";
-            } else {
-                // 修改字段名为下划线格式
-                query = "UPDATE student SET exam_grade = NULL WHERE student_id = ?";
+            // 根据成绩类型确定要删除的字段
+            String gradeColumn = "usual".equals(scoreType) ? "usual_grade" : "exam_grade";
+            String otherGradeColumn = "usual".equals(scoreType) ? "exam_grade" : "usual_grade";
+
+            // 首先获取另一个成绩，判断是否需要清除总成绩
+            String checkQuery = "SELECT " + otherGradeColumn + " FROM student WHERE student_id = ?";
+            BigDecimal otherGrade = null;
+
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setString(1, studentId);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        otherGrade = rs.getBigDecimal(1);
+                    }
+                }
             }
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            // 构建更新语句
+            String updateQuery;
+            if (otherGrade != null) {
+                // 如果另一个成绩存在，将当前成绩设为NULL，并计算新的总成绩
+                // 注意：实际上只有一个成绩时，总成绩应该为NULL
+                // 这里将总成绩设为NULL，因为计算总成绩需要两个成绩
+                updateQuery = "UPDATE student SET " + gradeColumn + " = NULL, total_grade = NULL WHERE student_id = ?";
+            } else {
+                // 如果另一个成绩也不存在，直接将当前成绩设为NULL，总成绩设为NULL
+                updateQuery = "UPDATE student SET " + gradeColumn + " = NULL, total_grade = NULL WHERE student_id = ?";
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                 preparedStatement.setString(1, studentId);
 
                 int rowsAffected = preparedStatement.executeUpdate();

@@ -3,6 +3,7 @@ package MainInterface;
 import Entity.User;
 import MainInterface.ScoreManagePackage.ShowScoreManage;
 import MainInterface.StudentManagePackage.ShowStudentManage;
+import MainInterface.TotalGradeManagePackage.ShowTotalGrade;
 import login.Login;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -378,7 +379,7 @@ public class MainInterface {
         for (Control control : contentArea.getChildren()) {
             control.dispose();
         }
-
+        new ShowTotalGrade(contentArea);
         contentArea.layout();
     }
 

@@ -10,6 +10,7 @@ public class Student {
     private String phone;
     private BigDecimal usualGrade;
     private BigDecimal examGrade;
+    private BigDecimal totalGrade;
 
     public Student() {
     }
@@ -23,6 +24,14 @@ public class Student {
         this.phone = phone;
     }
 
+    public BigDecimal getTotalGrade() {
+        return totalGrade;
+    }
+
+    public void setTotalGrade(BigDecimal totalGrade) {
+        this.totalGrade = totalGrade;
+    }
+
     // 全参构造器
     public Student(String studentId, String studentName, String gender, String className, String phone, BigDecimal usualGrade, BigDecimal examGrade) {
         this.studentId = studentId;
@@ -32,6 +41,7 @@ public class Student {
         this.phone = phone;
         this.usualGrade = usualGrade;
         this.examGrade = examGrade;
+        this.totalGrade = usualGrade.add(examGrade);
     }
 
     // Getters and Setters
